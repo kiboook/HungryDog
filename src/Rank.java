@@ -23,15 +23,15 @@ public class Rank extends JPanel {
 	public void connectDB() {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			System.out.println("드라이버 로드 성공");
+//			System.out.println("드라이버 로드 성공");
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		}
 
 		try { // 데이터베이스를 연결하는 과정
-			System.out.println("데이터베이스 연결 준비...");
+//			System.out.println("데이터베이스 연결 준비...");
 			con = DriverManager.getConnection(url, userid, pwd);
-			System.out.println("데이터베이스 연결 성공");
+//			System.out.println("데이터베이스 연결 성공");
 		} catch (SQLException e2) {
 			e2.printStackTrace();
 		}
@@ -39,18 +39,14 @@ public class Rank extends JPanel {
 	
 	private int[] lastScore = new int[2];
 	private JButton btnRestart, btnExit; // 재시작을 위해 스타트패널로 가는 restart 버튼과 게임 종료를 위한 exit 버튼
-	private JLabel lblTitle, lblSub; // RANKING, NAME SCORE를 띄워줄
+	private JLabel lblTitle, lblSub, lblName[] = new JLabel[5], lblScore[] = new JLabel[5]; // RANKING, NAME SCORE를 띄워줄
 																							// 라벨들과 랭킹에 띄워줄 name,
 																							// score들을 저장하는 lblName,
 																							// lblScore
 	
-	private int newScore; // 플레이한 새로운 점수를 저장하기 위한 변수
-	private String newName; // 새로운 이름 저장을 위한 newName
+	int idx; // 랭킹 Label을 DB로 부터 받아오고 랭킹 재조회 시 기존 랭킹을 지우는 index
 	private ImageIcon restart1, restart2, exit1, exit2; // 재시작, 종료 버튼에 이미지를 씌워주기 위한 이미지아이콘 각각 2개씩
 	
-	JLabel lblName[] = new JLabel[5];
-	JLabel lblScore[] = new JLabel[5];
-	int idx;
 	
 	public Rank() {
 		connectDB();
@@ -117,40 +113,34 @@ public class Rank extends JPanel {
 		add(btnExit);
 	}
 
-	// 랭킹 진입 여부를 위한 라스트 스코어 get 메소드
+	// 랭킹 진입 여부를 위한 라스트 스코어 get 메서드
 	public int[] getLastScore() {
-		// 2020.09.16
-		System.out.println("^_^_^_^_");
-		System.out.println(lastScore[0]);
-		System.out.println(lastScore[1]);
+		// 2020.09.16 기존엔 점수만 받아왔지만 기록이 4개 이하인 경우 무조건 랭킹 진입이기 때문에 기록 갯수도 저장
 		return lastScore;
 	}
 
-	// ----------------- 현재 랭킹 데이터의 마지막 인덱스에 게임 플레이한 새로운 데이터를 받아와 정렬하여 파일에 다시
-	// 덮어씌워줍니다. --------
+	// DB에 기록 저장 메서드, 메서드명 변경 해야 함
 	public void setNewRank(int score, String name) {
-		newScore = score; // 플레이한 새로운 점수
-		newName = name; // 사용자가 입력한 새로운 이름
 		
-		// 2020.09.16 DB 추가 테스트 //
 		String query = "INSERT INTO Score_Board VALUES(";
 		
 		try {
 			Statement stmt = con.createStatement();
 
 			String input = query + "'" + name + "', " + score + ");";
-			System.out.println(input);
+//			System.out.println(input);
 			stmt.executeUpdate(input);
-			System.out.println("상단의 쿼리문을 통해 DATA 추가 완료 !!!");
+//			System.out.println("상단의 쿼리문을 통해 DATA 추가 완료 !!!");
 		} catch (SQLException e1) {
+			// 팝업창으로 띄워야 함
 			System.out.println("존재하는 닉네임 입니다.");
 		}
-		// ------------------------- //
 	}
 
-	// -------------------새로운 플레이 데이터를 받아서 정렬된 rDatas 객체 배열을 Rank 패널에 다시 업로드하는 메소드
-	// -----------
+	// 랭킹을 최대 5등까지 출력하는 메서드, 메서드명 변경 해야 함
 	public void setList() {
+		
+		idx = 0;
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
@@ -166,13 +156,10 @@ public class Rank extends JPanel {
 			e.printStackTrace();
 		}
 		
-		idx = 0;
-		
 		try {
 			while (rs.next() && idx < 5) {
 				String name = rs.getString(1);
 				int score = rs.getInt(2);
-				System.out.println(name + score);
 				
 				// NAME 랭킹 라벨
 				lblName[idx] = new JLabel();
@@ -198,14 +185,14 @@ public class Rank extends JPanel {
 		}
 	}
 
-	public void hideLabel() { // 랭킹 조회마다 이전 랭킹은 숨김
+	public void hideLabel() { // 랭킹 조회마다 이전 랭킹은 숨김, 메서드명 변경해야함 
 		for (int i = 0; i < idx; i++) {
 			lblName[i].setVisible(false);
 			lblScore[i].setVisible(false);
 		}
 	}
 	
-	// ------------------- 리스너를 위해 버튼들 넘겨주기 위한 get 메소드들--------------
+	// 리스너를 위해 버튼들 넘겨주기 위한 get 메소드들
 	public JButton getRestart() {
 		return btnRestart;
 	}
