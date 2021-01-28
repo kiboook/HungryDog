@@ -4,6 +4,8 @@
 
 2020 3-2 문제해결기법 : 기개발된 프로젝트를 리팩토링 하는 수업이다.
 
+리팩토링 완료 : https://github.com/Nam-Ki-Bok/HungryDog-Refactoring
+
 ***
 
 
