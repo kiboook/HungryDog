@@ -1,7 +1,5 @@
 # Hungry Dog
 
-<a href="https://github.com/Nam-Ki-Bok/HungryDog" style="color:#0FA678">GitHub</a>
-
 리팩토링 완료 : https://github.com/Nam-Ki-Bok/HungryDog-Refactoring
 
 ***
